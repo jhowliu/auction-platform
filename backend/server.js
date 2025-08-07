@@ -7,7 +7,7 @@ const connectDB = require('./config/db');
 dotenv.config();
 
 var corsOption = {
-  origin: ['http://localhost:3000', 'http://54.252.239.73:5001'],
+  origin: ['http://localhost:3000', 'http://54.252.239.73'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
