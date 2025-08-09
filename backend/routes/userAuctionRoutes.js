@@ -10,8 +10,8 @@ const {
   deleteAuction,
 } = require('../controllers/userAuctionController')
 
-router.get('/', getUserAunctions);
-router.get('/:id', getAuctionById);
+router.get('/', protect, getUserAunctions);
+router.get('/:id', protect, getAuctionById);
 router.post('/', protect, validateAuctionData, createAuction);
 router.put('/:id', protect, updateAuction);
 router.delete('/:id', protect, deleteAuction);
