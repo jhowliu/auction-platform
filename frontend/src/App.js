@@ -9,8 +9,8 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <Auctions />
       <Routes>
+        <Route path="/" element={<Auctions />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
