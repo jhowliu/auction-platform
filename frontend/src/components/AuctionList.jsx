@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { auctionService } from '../services/auctionService';
 import AuctionCard from './AuctionCard';
 
 
@@ -44,7 +43,6 @@ const dummies = [{
 }]
 
 const AuctionList = () => {
-  const { user } = useAuth();
   const [auctions, setAuctions] = useState(dummies);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -64,18 +62,6 @@ const AuctionList = () => {
       setError(err.message || 'Failed to fetch auctions');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleBid = async (auctionId, amount) => {
-    try {
-      const response = await auctionService.placeBid(auctionId, amount);
-      if (response.success) {
-        // Refresh auctions to show updated bid
-        fetchAuctions();
-      }
-    } catch (err) {
-      throw new Error(err.response?.data?.error || 'Failed to place bid');
     }
   };
 
