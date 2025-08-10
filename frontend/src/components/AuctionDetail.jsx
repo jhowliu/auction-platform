@@ -1,40 +1,66 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams} from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useEffect, useState, useRef } from "react";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import auctionService from "../services/auctionService";
 
-export default function AuctionDetail() {
+export default function AuctionDetail({ 
+    auction: propAuction, 
+}) {
+    const Ref = useRef(null);
     const { id } = useParams();
-    const { user } = useAuth();
-    const [auction, setAuction] = useState({});
+    const [timer, setTimer] = useState("");
+    const [auction, setAuction] = useState(propAuction || {});
+    const [loading, setLoading] = useState(!propAuction);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchAuction = async (id) => {
-            try {
-                const response = await auctionService.getAuctionById(id)
-                console.log('test')
-                if (response.success) {
-                    setAuction(response.data);
-                }
-            } catch (error) {
-                alert('Failed to fetch auctions.');
-            }
-        }
-
-        fetchAuction(id);
-    }, [id])
-
-    const handleOnDelete = async () => {
-        try {
-            const response = await auctionService.deleteAuction(auction.id);
-            if (response.success) {
-                navigate('/');
-            }
-        } catch {
-            alert("failed to delete this auction");
-        }
+    const startTimer = (e) => {
+        setTimer(getTimeRemaining());
     }
+
+    const clearTimer = (e) => {
+        if (Ref.current) clearInterval(Ref.current);
+        const id = setInterval(() => {
+            startTimer(e);
+        }, 1000);
+        Ref.current = id;
+    };
+
+    useEffect(() => {
+        clearTimer()
+    })
+
+    useEffect(() => {
+        if (!propAuction && id) {
+            fetchAuction();
+        }
+    }, [id, navigate, propAuction]);
+
+    const fetchAuction = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await auctionService.getAuctionById(id);
+            if (response.success) {
+                setAuction(response.data);
+            }
+        } catch (error) {
+            setError(error.response?.data?.error || 'Failed to fetch auction');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getAuctionStatus = (auction) => {
+        if (!auction || !auction.startDate || !auction.endDate) return 'Unknown';
+        
+        const now = new Date();
+        const startDate = new Date(auction.startDate);
+        const endDate = new Date(auction.endDate);
+        
+        if (now < startDate) return 'Upcoming';
+        if (now > endDate) return 'Ended';
+        return 'Active';
+    };
 
     const getTimeRemaining = () => {
         if (!auction || !auction.endDate) return '';
@@ -43,7 +69,7 @@ export default function AuctionDetail() {
         const endDate = new Date(auction.endDate);
         const diff = endDate - now;
 
-        if (diff <= 0) return 'ENDED';
+        if (diff <= 0) return '';
 
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -54,69 +80,111 @@ export default function AuctionDetail() {
         if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
         return `${minutes}m ${seconds}s`;
     };
-
-    // const formatDate = (dateString) => {
-    //     return new Date(dateString).toLocaleString();
-    // };
-
-    return (
-        <div className="bg-white">
-            <div className="mx-auto max-w-4xl grid grid-cols-2 p-16 border-2 gap-x-8 mt-16">
-                {/* Image gallery */}
-                <div className="mx-auto">
-                    {auction.images && (
-                        <img
-                            alt="image1"
-                            src={auction.images.length > 0 ? auction.images[0] : '/placeholder-image.jpg'}
-                            className="h-auto object-contain rounded-lg shadow-xl dark:shadow-gray-800 max-lg:hidden"
-                        />
-                    )}
-                </div>
-
-                {/* Product info */}
-                <div className="max-w-2xl px-4 pb-2">
-                    <div className="flex items-center mb-4">
-                        <h1 className="text-3xl font-bold text-gray-800">{auction.title}</h1>
+    
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 p-6">
+                <div className="max-w-6xl mx-auto">
+                    <div className="flex justify-center items-center h-64">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                     </div>
-                    <div className="mt-5 flex">
-                        <div className="text-lg font-bold text-orange-600">
-                            {getTimeRemaining()}
-                        </div>
-                    </div>
-
-                    <div className="py-10 lg:col-span-2 lg:col-start-1 lg:pt-6 lg:pr-8 lg:pb-16">
-                        <div className="grid gap-y-1">
-                            <div>
-                                <span className="text-gray-500">Category:</span>
-                                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
-                                    {auction.category}
-                                </span>
-                            </div>
-                            <div className="flex items-center">
-                                <span className="text-gray-500">Current Price: </span>
-                                <span className="px-2 py-1 text-base font-bold text-green-600">
-                                    ${auction.currentPrice}
-                                </span>
-                            </div>
-
-                            <div className="flex">
-                                <span className="text-gray-500">Starting Price:</span>
-                                <div className="px-1 font-base">${auction.startingPrice}</div>
-                            </div>
-
-                            <div className="flex">
-                                <span className="text-gray-500">Total Bids:</span>
-                                <div className="px-1 font-base">{auction.totalBids}</div>
-                            </div>
-                        </div>
-                    </div>
-                    {
-                        user && (
-                            <button onClick={handleOnDelete}>DELETE</button>
-                        )
-                    }
                 </div>
             </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gray-50 p-6">
+                <div className="max-w-6xl mx-auto">
+                    <div className="bg-white rounded-lg shadow-lg p-8">
+                        <div className="text-center py-16">
+                            <div className="text-red-600 mb-4">
+                                <h3 className="text-lg font-medium">Error Loading Auction</h3>
+                                <p className="text-sm mt-2">{error}</p>
+                            </div>
+                            <Link
+                                to="/auctions"
+                                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                Back to Auctions
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    const status = getAuctionStatus(auction);
+
+    return (
+        <div className="min-h-screen bg-gray-50 p-6">
+            <div className="max-w-6xl mx-auto">
+                <div className="bg-white rounded-lg shadow-lg p-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Image gallery */}
+                        <div className="">
+                            {auction.images && auction.images.length > 0 ? (
+                                <img
+                                    alt={auction.title}
+                                    src={auction.images[0]}
+                                    className="w-full h-auto object-contain rounded-lg shadow-lg"
+                                />
+                            ) : (
+                                <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <span className="text-gray-500">No image available</span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Auction info */}
+                        <div className="space-y-6">
+                            <div>
+                                <div className="flex items-center space-x-4 mb-4">
+                                    <h1 className="text-3xl font-bold text-gray-800">{auction.title}</h1>
+                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                        status === 'Active' ? 'bg-green-100 text-green-800' :
+                                        status === 'Ended' ? 'bg-red-100 text-red-800' :
+                                        'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                        {status}
+                                    </span>
+                                </div>
+                                <div className="text-lg font-bold text-orange-600">{timer}</div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Description</h3>
+                                    <p className="text-gray-600">{auction.description || 'No description available'}</p>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <h4 className="font-medium text-gray-800">Starting Price</h4>
+                                        <p className="text-lg font-bold text-green-600">${auction.startingPrice}</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-medium text-gray-800">Current Bids</h4>
+                                        <p className="text-lg font-bold text-blue-600">{auction.totalBids || 0}</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="text-sm text-gray-500">
+                                        <strong>Start:</strong> {new Date(auction.startDate).toLocaleString()}
+                                    </div>
+                                    <div className="text-sm text-gray-500">
+                                        <strong>End:</strong> {new Date(auction.endDate).toLocaleString()}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    )
+    );
 }

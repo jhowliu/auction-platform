@@ -61,22 +61,12 @@ const Tasks = () => {
                 Discover amazing items and place your bids
               </p>
             </div>
-            
-            {user && (
-              <Link
-                to="/auctions/create"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 "
-              >
-                Create Auction
-              </Link>
-            )}
           </div>
         </div>
       </div>
 
       <AuctionList
         auctions={auctions}
-        currentUser={user}
       />
       {/* Call to Action for Non-logged in users */}
     </div>
