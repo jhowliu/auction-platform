@@ -1,6 +1,6 @@
 import { useState, useEffect  } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { auctionService } from '../services/auctionService';
+import auctionService from '../services/auctionService';
 
 const AuctionForm = ({ isEdit = false }) => {
   const navigate = useNavigate();
@@ -114,7 +114,7 @@ const AuctionForm = ({ isEdit = false }) => {
       }
 
       if (response.success) {
-        navigate(`/auctions/${response.data._id}`);
+        navigate("/my-auctions");
       }
     } catch (err) {
       setError(err.response?.data?.error || err.message || `Failed to ${isEdit ? 'update' : 'create'} auction`);

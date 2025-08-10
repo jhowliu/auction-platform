@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import auctionService from '../services/auctionService';
-import AuctionDetail from '../components/AuctionDetail';
+import AuctionMgmtItem from '../components/AuctionMgmtItem';
 
 const AuctionMgmt = () => {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,27 +13,28 @@ const AuctionMgmt = () => {
   const [deleteModal, setDeleteModal] = useState({ show: false, auction: null });
 
   useEffect(() => {
+    if (authLoading) return; // Wait for auth to finish loading
     if (!user) {
       navigate('/login');
       return;
     }
-    fetchUserAuctions();
-  }, [user, navigate]);
-
-  const fetchUserAuctions = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await auctionService.getUserAuctions();
-      if (response.success) {
-        setAuctions(response.data);
+    const fetchUserAuctions = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await auctionService.getUserAuctions();
+        if (response.success) {
+          setAuctions(response.data);
+        }
+      } catch (err) {
+        setError(err.response?.data?.error || 'Failed to fetch auctions');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to fetch auctions');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchUserAuctions();
+  }, [user, navigate, authLoading]);
 
   const handleDelete = async (auctionId) => {
     try {
@@ -55,13 +56,6 @@ const AuctionMgmt = () => {
     setDeleteModal({ show: false, auction: null });
   };
 
-  const canEditAuction = (auction) => {
-    return auction.totalBids === 0;
-  };
-
-  const canDeleteAuction = (auction) => {
-    return auction.totalBids === 0;
-  };
 
   if (loading) {
     return (
@@ -113,46 +107,13 @@ const AuctionMgmt = () => {
             </div>
           ) : (
             <div className="space-y-6">
-              {auctions.map((auction) => {
-                const canEdit = canEditAuction(auction);
-                const canDelete = canDeleteAuction(auction);
-                
-                return (
-                  <div key={auction._id} className='mt-10 bg-gray-50'>
-                    {/* Action buttons */}
-                    <div className="flex flex-wrap gap-2 border-gray-200">
-                      {canEdit && (
-                        <Link
-                          to={`/auctions/${auction._id}/edit`}
-                          className="px-4 py-2 font-light text-xl bg-yellow-100 text-yellow-700 border-b rounded-md hover:bg-yellow-200 transition-colors"
-                        >
-                          Edit
-                        </Link>
-                      )}
-                      
-                      {canDelete && (
-                        <button
-                          onClick={() => openDeleteModal(auction)}
-                          className="px-4 py-2 font-light text-xl bg-red-100 text-red-700 rounded-md border-b hover:bg-red-200 transition-colors"
-                        >
-                          Delete
-                        </button>
-                      )}
-                      
-                      {!canEdit && (
-                        <span className="px-4 py-2 bg-gray-100 text-gray-500 rounded-md cursor-not-allowed">
-                          Cannot edit (has bids)
-                        </span>
-                      )}
-                    </div>
-
-                    <div>
-                      <AuctionDetail auction={auction} />
-                    </div>
-                    
-                  </div>
-                );
-              })}
+              {auctions.map((auction) => (
+                <AuctionMgmtItem 
+                  key={auction._id} 
+                  auction={auction} 
+                  onDelete={openDeleteModal}
+                />
+              ))}
             </div>
           )}
         </div>
