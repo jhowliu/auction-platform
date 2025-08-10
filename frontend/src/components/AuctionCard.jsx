@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from 'react-router-dom';
 
 export default function AuctionCard({ auction, currentUser }) {
     // We need ref in this, because we are dealing
@@ -52,10 +53,10 @@ export default function AuctionCard({ auction, currentUser }) {
             <div className="mt-4">
                 <div>
                     <h3 className="text-sm text-gray-700 mb-1">
-                    <a href={`/auctions/${auction._id}`}>
+                    <Link to={`/auctions/${auction._id}`}>
                         <span aria-hidden="true" className="absolute inset-0" />
                         {auction.title}
-                    </a>
+                    </Link>
                     </h3>
                 </div>
                 <p className="text-sm font-medium text-gray-900">${auction.currentPrice}</p>

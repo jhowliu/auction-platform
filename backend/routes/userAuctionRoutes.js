@@ -5,11 +5,11 @@ const { validateAuctionData } = require('../middleware/validation');
 const {
   createAuction,
   updateAuction,
-  getUserAunctions,
+  getUserAuctions,
   deleteAuction,
 } = require('../controllers/userAuctionController')
 
-router.get('/', protect, getUserAunctions);
+router.get('/', protect, getUserAuctions);
 router.post('/', protect, validateAuctionData, createAuction);
 router.put('/:id', protect, updateAuction);
 router.delete('/:id', protect, deleteAuction);

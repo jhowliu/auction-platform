@@ -36,7 +36,7 @@ const createAuction = async (req, res) => {
 
 // users/aunctions
 // listing all aunction items that user created
-const getUserAunctions = async (req, res) => {
+const getUserAuctions = async (req, res) => {
   try {
     const auctions = await Auction.find({seller: req.user.id}).populate('seller', 'username')
     res.json({
@@ -145,7 +145,7 @@ const deleteAuction = async (req, res) => {
 
 module.exports = {
   createAuction,
-  getUserAunctions,
+  getUserAuctions,
   updateAuction,
   deleteAuction
 };

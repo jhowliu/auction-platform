@@ -14,8 +14,11 @@ const auctionService = {
   },
 
   getUserAuctions: async (params = {}) => {
+    const token = localStorage.getItem('token');
     const queryString = new URLSearchParams(params).toString();
-    const response = await axiosInstance.get(`${USER_API_BASE}?${queryString}`);
+    const response = await axiosInstance.get(`${USER_API_BASE}?${queryString}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
     return response.data;
   },
 
@@ -47,4 +50,5 @@ const auctionService = {
   },
 };
 
+export { auctionService };
 export default auctionService;
