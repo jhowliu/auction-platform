@@ -51,33 +51,6 @@ const getUserAunctions = async (req, res) => {
   } 
 }
 
-// auctions/:id
-// auction item details 
-const getAuctionById = async (req, res) => {
-  try {
-    const auction = await Auction.findById(req.params.id)
-      .populate('seller', 'username email')
-      .populate('winner', 'username');
-
-    if (!auction) {
-      return res.status(404).json({
-        success: false,
-        error: 'Auction not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      data: auction
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
-  }
-};
-
 const updateAuction = async (req, res) => {
   try {
     const auction = await Auction.findById(req.params.id);
@@ -173,7 +146,6 @@ const deleteAuction = async (req, res) => {
 module.exports = {
   createAuction,
   getUserAunctions,
-  getAuctionById,
   updateAuction,
   deleteAuction
 };

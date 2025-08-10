@@ -45,14 +45,14 @@ export default function AuctionCard({ auction, currentUser }) {
     return (
         <div key={auction._id} className="group relative">
             <img
-                alt={auction.images.length && auction.images[0].src}
-                src={auction.images.length && auction.images[0].src}
+                alt={auction.images.length && auction.images[0]}
+                src={auction.images.length && auction.images[0]}
                 className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
             />
             <div className="mt-4">
                 <div>
                     <h3 className="text-sm text-gray-700 mb-1">
-                    <a href={auction._id}>
+                    <a href={`/auctions/${auction._id}`}>
                         <span aria-hidden="true" className="absolute inset-0" />
                         {auction.title}
                     </a>
