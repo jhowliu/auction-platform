@@ -1,26 +1,43 @@
-const auction = {
-    title: "Basic Tee",
-    images: [{
-        src: "https://tailwindcss.com/plus-assets/img/ecommerce-images/product-page-01-featured-product-shot.jpg"
-    }],
-    "startingPrice": 100,
-    "category": "Home",
-    "startDate": "2025-08-09T06:32:20.220Z",
-    "endDate": "2025-08-19T06:35:20.220Z",
-    "status": "ended",
-    "seller": {
-        "_id": "689429624cd837408822c65f"
-    },
-    "totalBids": 0,
-    "currentPrice": 10,
-    "createdAt": "2025-08-09T06:32:08.492Z",
-    "updatedAt": "2025-08-09T06:33:12.856Z",
-}
+import { useEffect, useState } from "react";
+import { useNavigate, useParams} from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import auctionService from "../services/auctionService";
 
+export default function AuctionDetail() {
+    const { id } = useParams();
+    const { user } = useAuth();
+    const [auction, setAuction] = useState({});
+    const navigate = useNavigate();
 
-export default function AuctionItem() {
+    useEffect(() => {
+        const fetchAuction = async (id) => {
+            try {
+                const response = await auctionService.getAuctionById(id)
+                console.log('test')
+                if (response.success) {
+                    setAuction(response.data);
+                }
+            } catch (error) {
+                alert('Failed to fetch auctions.');
+            }
+        }
+
+        fetchAuction(id);
+    }, [id])
+
+    const handleOnDelete = async () => {
+        try {
+            const response = await auctionService.deleteAuction(auction.id);
+            if (response.success) {
+                navigate('/');
+            }
+        } catch {
+            alert("failed to delete this auction");
+        }
+    }
+
     const getTimeRemaining = () => {
-        if (!auction) return '';
+        if (!auction || !auction.endDate) return '';
         
         const now = new Date();
         const endDate = new Date(auction.endDate);
@@ -38,20 +55,22 @@ export default function AuctionItem() {
         return `${minutes}m ${seconds}s`;
     };
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleString();
-    };
+    // const formatDate = (dateString) => {
+    //     return new Date(dateString).toLocaleString();
+    // };
 
     return (
         <div className="bg-white">
-            <div className="mx-auto max-w-4xl grid grid-cols-2 p-16 border gap-x-8">
+            <div className="mx-auto max-w-4xl grid grid-cols-2 p-16 border-2 gap-x-8 mt-16">
                 {/* Image gallery */}
                 <div className="mx-auto">
-                    <img
-                        alt="image1"
-                        src={auction.images.length && auction.images[0].src}
-                        className="h-auto object-contain rounded-lg shadow-xl dark:shadow-gray-800 max-lg:hidden"
-                    />
+                    {auction.images && (
+                        <img
+                            alt="image1"
+                            src={auction.images.length > 0 ? auction.images[0] : '/placeholder-image.jpg'}
+                            className="h-auto object-contain rounded-lg shadow-xl dark:shadow-gray-800 max-lg:hidden"
+                        />
+                    )}
                 </div>
 
                 {/* Product info */}
@@ -91,6 +110,11 @@ export default function AuctionItem() {
                             </div>
                         </div>
                     </div>
+                    {
+                        user && (
+                            <button onClick={handleOnDelete}>DELETE</button>
+                        )
+                    }
                 </div>
             </div>
         </div>

@@ -18,7 +18,9 @@ const app = express();
 app.use(cors(corsOption));
 app.use(express.json());
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/auctions', require('./routes/auctionRoutes'));
 app.use('/api/users/auctions', require('./routes/userAuctionRoutes'));
+
 
 // Export the app object for testing
 if (require.main === module) {

@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import axiosInstance from '../axiosConfig';
 import AuctionList from '../components/AuctionList';
+import auctionService from '../services/auctionService';
 
 const Tasks = () => {
   const { user } = useAuth();
@@ -11,9 +11,7 @@ const Tasks = () => {
   useEffect(() => {
     const fetchAuctions = async () => {
       try {
-        const response = await axiosInstance.get('/api/users/auctions', {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
+        const response = await auctionService.getAuctions() 
         setAuctions(response.data);
       } catch (error) {
         alert('Failed to fetch auctions.');
@@ -78,6 +76,7 @@ const Tasks = () => {
 
       <AuctionList
         auctions={auctions}
+        currentUser={user}
       />
       {/* Call to Action for Non-logged in users */}
     </div>

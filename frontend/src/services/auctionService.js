@@ -3,7 +3,7 @@ import axiosInstance from '../axiosConfig';
 const USER_API_BASE = '/api/users/auctions';
 const API_BASE = '/api/auctions';
 
-export const auctionService = {
+const auctionService = {
   // Auction CRUD operations
   createAuction: async (auctionData) => {
     const token = localStorage.getItem('token');
@@ -26,7 +26,7 @@ export const auctionService = {
   },
 
   getAuctionById: async (id) => {
-    const response = await axiosInstance.get(`${USER_API_BASE}/${id}`);
+    const response = await axiosInstance.get(`${API_BASE}/${id}`);
     return response.data;
   },
 
@@ -46,3 +46,5 @@ export const auctionService = {
     return response.data;
   },
 };
+
+export default auctionService;
