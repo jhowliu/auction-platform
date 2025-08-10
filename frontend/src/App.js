@@ -13,9 +13,10 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Navbar className="mb-10" />
+        <Navbar />
         <Routes>
           <Route path="/" element={<Auctions />} />
+          <Route path="/auctions" element={<Auctions />} />
           <Route path="/auctions/:id" element={<AuctionDetail />} />
           <Route path="/auctions/:id/edit" element={<AuctionForm isEdit={true} />} />
           <Route path="/auctions/create" element={<AuctionForm />} />

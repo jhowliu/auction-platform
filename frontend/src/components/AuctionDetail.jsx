@@ -2,15 +2,13 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import auctionService from "../services/auctionService";
 
-export default function AuctionDetail({ 
-    auction: propAuction, 
-}) {
+export default function AuctionDetail({ auction: propAuction }) {
     const Ref = useRef(null);
     const { id } = useParams();
+    const [auction, setAuction] = useState(propAuction||{})
     const [timer, setTimer] = useState("");
-    const [auction, setAuction] = useState(propAuction || {});
-    const [loading, setLoading] = useState(!propAuction);
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const startTimer = (e) => {
         setTimer(getTimeRemaining());
@@ -27,8 +25,6 @@ export default function AuctionDetail({
     useEffect(() => {
         clearTimer()
     })
-
-   
 
     useEffect(() => {
         const fetchAuction = async () => {
@@ -121,7 +117,7 @@ export default function AuctionDetail({
     const status = getAuctionStatus(auction);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 pt-16 pb-10">
             <div className="max-w-6xl mx-auto">
                 <div className="bg-white rounded-lg shadow-lg p-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
