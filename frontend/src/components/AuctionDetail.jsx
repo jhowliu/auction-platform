@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import auctionService from "../services/auctionService";
 
 export default function AuctionDetail({ 
@@ -11,7 +11,6 @@ export default function AuctionDetail({
     const [auction, setAuction] = useState(propAuction || {});
     const [loading, setLoading] = useState(!propAuction);
     const [error, setError] = useState(null);
-    const navigate = useNavigate();
 
     const startTimer = (e) => {
         setTimer(getTimeRemaining());
@@ -29,26 +28,29 @@ export default function AuctionDetail({
         clearTimer()
     })
 
+   
+
     useEffect(() => {
+        const fetchAuction = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const response = await auctionService.getAuctionById(id);
+                if (response.success) {
+                    setAuction(response.data);
+                }
+            } catch (error) {
+                setError(error.response?.data?.error || 'Failed to fetch auction');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         if (!propAuction && id) {
             fetchAuction();
         }
-    }, [id, navigate, propAuction]);
+    }, [id, propAuction]);
 
-    const fetchAuction = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const response = await auctionService.getAuctionById(id);
-            if (response.success) {
-                setAuction(response.data);
-            }
-        } catch (error) {
-            setError(error.response?.data?.error || 'Failed to fetch auction');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const getAuctionStatus = (auction) => {
         if (!auction || !auction.startDate || !auction.endDate) return 'Unknown';
@@ -119,7 +121,7 @@ export default function AuctionDetail({
     const status = getAuctionStatus(auction);
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className="min-h-screen bg-gray-50">
             <div className="max-w-6xl mx-auto">
                 <div className="bg-white rounded-lg shadow-lg p-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -142,7 +144,7 @@ export default function AuctionDetail({
                         <div className="space-y-6">
                             <div>
                                 <div className="flex items-center space-x-4 mb-4">
-                                    <h1 className="text-3xl font-bold text-gray-800">{auction.title}</h1>
+                                    <h1 className="text-4xl font-thin text-gray-800">{auction.title}</h1>
                                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                                         status === 'Active' ? 'bg-green-100 text-green-800' :
                                         status === 'Ended' ? 'bg-red-100 text-red-800' :
@@ -151,31 +153,31 @@ export default function AuctionDetail({
                                         {status}
                                     </span>
                                 </div>
-                                <div className="text-lg font-bold text-orange-600">{timer}</div>
+                                <div className="text-lg font-light text-orange-600">{timer}</div>
                             </div>
 
                             <div className="space-y-4">
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Description</h3>
-                                    <p className="text-gray-600">{auction.description || 'No description available'}</p>
+                                    <h3 className="text-lg font-light text-gray-800 mb-2">Description</h3>
+                                    <p className="text-gray-600 font-thin">{auction.description || 'No description available'}</p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <h4 className="font-medium text-gray-800">Starting Price</h4>
-                                        <p className="text-lg font-bold text-green-600">${auction.startingPrice}</p>
+                                        <h4 className="font-light text-gray-800">Starting Price</h4>
+                                        <p className="text-lg font-thin text-green-600">${auction.startingPrice}</p>
                                     </div>
                                     <div>
-                                        <h4 className="font-medium text-gray-800">Current Bids</h4>
-                                        <p className="text-lg font-bold text-blue-600">{auction.totalBids || 0}</p>
+                                        <h4 className="font-light text-gray-800">Current Bids</h4>
+                                        <p className="text-lg font-thin text-blue-600">{auction.totalBids || 0}</p>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <div className="text-sm text-gray-500">
+                                    <div className="text-sm font-light text-gray-500">
                                         <strong>Start:</strong> {new Date(auction.startDate).toLocaleString()}
                                     </div>
-                                    <div className="text-sm text-gray-500">
+                                    <div className="text-sm font-light text-gray-500">
                                         <strong>End:</strong> {new Date(auction.endDate).toLocaleString()}
                                     </div>
                                 </div>
