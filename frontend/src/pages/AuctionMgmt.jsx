@@ -76,9 +76,9 @@ const AuctionMgmt = () => {
   }
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white border p-8">
+        <div className="gray-50 p-8">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800">My Auctions</h1>
             <Link
@@ -118,13 +118,13 @@ const AuctionMgmt = () => {
                 const canDelete = canDeleteAuction(auction);
                 
                 return (
-                  <div key={auction._id}>
+                  <div key={auction._id} className='mt-10 bg-gray-50'>
                     {/* Action buttons */}
-                    <div className="flex flex-wrap mb-4 gap-4 border-gray-200">
+                    <div className="flex flex-wrap gap-2 border-gray-200">
                       {canEdit && (
                         <Link
                           to={`/auctions/${auction._id}/edit`}
-                          className="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-md hover:bg-yellow-200 transition-colors"
+                          className="px-4 py-2 font-light text-xl bg-yellow-100 text-yellow-700 border-b rounded-md hover:bg-yellow-200 transition-colors"
                         >
                           Edit
                         </Link>
@@ -133,7 +133,7 @@ const AuctionMgmt = () => {
                       {canDelete && (
                         <button
                           onClick={() => openDeleteModal(auction)}
-                          className="px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
+                          className="px-4 py-2 font-light text-xl bg-red-100 text-red-700 rounded-md border-b hover:bg-red-200 transition-colors"
                         >
                           Delete
                         </button>

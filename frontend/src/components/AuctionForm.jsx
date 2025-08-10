@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect  } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { auctionService } from '../services/auctionService';
 
@@ -26,31 +26,6 @@ const AuctionForm = ({ isEdit = false }) => {
     'Art',
     'Other'
   ];
-
-  const fetchAuction = useCallback(async () => {
-    if (!isEdit || !id) return;
-    
-    setLoading(true);
-    try {
-      const response = await auctionService.getAuctionById(id);
-      if (response.success) {
-        const auction = response.data;
-        setFormData({
-          title: auction.title,
-          description: auction.description,
-          startingPrice: auction.startingPrice.toString(),
-          category: auction.category,
-          startDate: new Date(auction.startDate).toISOString().slice(0, 16),
-          endDate: new Date(auction.endDate).toISOString().slice(0, 16),
-          images: auction.images.length > 0 ? auction.images : ['']
-        });
-      }
-    } catch (err) {
-      setError(err.message || 'Failed to fetch auction details');
-    } finally {
-      setLoading(false);
-    }
-  }, [isEdit, id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -149,8 +124,33 @@ const AuctionForm = ({ isEdit = false }) => {
   };
 
   useEffect(() => {
-    fetchAuction();
-  }, [fetchAuction]);
+      if (!isEdit || !id) return;
+      setLoading(true);
+      
+      const fetchAuctionById = async () => {
+        try {
+          const response = await auctionService.getAuctionById(id);
+          if (response.success) {
+            const auction = response.data;
+            setFormData({
+              title: auction.title,
+              description: auction.description,
+              startingPrice: auction.startingPrice.toString(),
+              category: auction.category,
+              startDate: new Date(auction.startDate).toISOString().slice(0, 16),
+              endDate: new Date(auction.endDate).toISOString().slice(0, 16),
+              images: auction.images.length > 0 ? auction.images : ['']
+            });
+          }
+        } catch (err) {
+          setError(err.message || 'Failed to fetch auction details');
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      fetchAuctionById(id)
+  }, [isEdit, id]);
 
   if (loading && isEdit) {
     return (

@@ -13,7 +13,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Navbar />
+        <Navbar className="mb-10" />
         <Routes>
           <Route path="/" element={<Auctions />} />
           <Route path="/auctions/:id" element={<AuctionDetail />} />
