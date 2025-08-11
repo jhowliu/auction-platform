@@ -5,17 +5,9 @@ const connectDB = require('./config/db');
 
 dotenv.config();
 
-var corsOption = {
-  origin: ['http://localhost:3000', 'http://13.211.153.80'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}
-
-
 const app = express();
 
-app.use(cors(corsOption));
+app.use(cors());
 app.use(express.json());
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/auctions', require('./routes/auctionRoutes'));
