@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import auctionService from "../services/auctionService";
+import bidService from "../services/bidService";
 
 export default function AuctionDetail({ auction: propAuction }) {
     const Ref = useRef(null);
@@ -9,6 +10,7 @@ export default function AuctionDetail({ auction: propAuction }) {
     const [timer, setTimer] = useState("");
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [bidAmount, setBidAmount] = useState("");
 
     const startTimer = (e) => {
         setTimer(getTimeRemaining());
@@ -78,6 +80,33 @@ export default function AuctionDetail({ auction: propAuction }) {
         if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
         return `${minutes}m ${seconds}s`;
     };
+
+    const handlePlaceBid = async (e) => {
+        e.preventDefault();
+        
+        const amount = parseFloat(bidAmount);
+        if (!amount || amount <= auction.currentPrice) {
+            alert(`Bid must be higher than current price of $${auction.currentPrice}`);
+            return;
+        }
+
+        try {
+            const response = await bidService.placeBid(id, amount);
+            
+            if (response.success) {
+                alert('Bid placed successfully!');
+                setBidAmount('');
+                
+                // Refresh auction data
+                const updatedAuction = await auctionService.getAuctionById(id);
+                if (updatedAuction.success) {
+                    setAuction(updatedAuction.data);
+                }
+            }
+        } catch (error) {
+            alert(error.response?.data?.error || 'Failed to place bid');
+        }
+    };
     
     if (loading) {
         return (
@@ -122,7 +151,7 @@ export default function AuctionDetail({ auction: propAuction }) {
                 <div className="bg-white rounded-lg shadow-lg p-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Image gallery */}
-                        <div className="">
+                        <div>
                             {auction.images && auction.images.length > 0 ? (
                                 <img
                                     alt={auction.title}
@@ -158,17 +187,20 @@ export default function AuctionDetail({ auction: propAuction }) {
                                     <p className="text-gray-600 font-thin">{auction.description || 'No description available'}</p>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <h4 className="font-light text-gray-800">Current Bid</h4>
+                                        {auction.totalBid == 0 ? (
+                                            <p className="text-lg font-thin text-red-600">No Bids</p>
+                                        ) : (
+                                            <p className="text-3xl font-medium text-green-600">${auction.currentPrice}</p>
+                                        )}
+                                    </div>
                                     <div>
                                         <h4 className="font-light text-gray-800">Starting Price</h4>
-                                        <p className="text-lg font-thin text-green-600">${auction.startingPrice}</p>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-light text-gray-800">Current Bids</h4>
-                                        <p className="text-lg font-thin text-blue-600">{auction.totalBids || 0}</p>
+                                        <p className="text-lg font-thin">${auction.startingPrice}</p>
                                     </div>
                                 </div>
-
                                 <div>
                                     <div className="text-sm font-light text-gray-500">
                                         <strong>Start:</strong> {new Date(auction.startDate).toLocaleString()}
@@ -177,6 +209,36 @@ export default function AuctionDetail({ auction: propAuction }) {
                                         <strong>End:</strong> {new Date(auction.endDate).toLocaleString()}
                                     </div>
                                 </div>
+
+                                {status === 'Active' && (
+                                    <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                                        <h4 className="text-lg font-light text-gray-800 mb-4">Place a Bid</h4>
+                                        <form onSubmit={handlePlaceBid} className="space-y-4">
+                                            <div>
+                                                <label htmlFor="bidAmount" className="block text-sm font-light text-gray-700 mb-2">
+                                                    Bid Amount (must be higher than ${auction.currentPrice})
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    id="bidAmount"
+                                                    value={bidAmount}
+                                                    onChange={(e) => setBidAmount(e.target.value)}
+                                                    min={auction.currentPrice + 0.01}
+                                                    step="0.01"
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    placeholder="Enter your bid amount"
+                                                    required
+                                                />
+                                            </div>
+                                            <button
+                                                type="submit"
+                                                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-light"
+                                            >
+                                                Place Bid
+                                            </button>
+                                        </form>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

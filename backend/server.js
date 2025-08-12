@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/auctions', require('./routes/auctionRoutes'));
+app.use('/api/auctions', require('./routes/bidRoutes'), require('./routes/auctionRoutes'));
 app.use('/api/users/auctions', require('./routes/userAuctionRoutes'));
 
 
