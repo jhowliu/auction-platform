@@ -137,8 +137,8 @@ const AuctionForm = ({ isEdit = false }) => {
               description: auction.description,
               startingPrice: auction.startingPrice.toString(),
               category: auction.category,
-              startDate: new Date(auction.startDate).toISOString().slice(0, 16),
-              endDate: new Date(auction.endDate).toISOString().slice(0, 16),
+              startDate: new Date(auction.startDate).toISOString(),
+              endDate: new Date(auction.endDate).toISOString(),
               images: auction.images.length > 0 ? auction.images : ['']
             });
           }

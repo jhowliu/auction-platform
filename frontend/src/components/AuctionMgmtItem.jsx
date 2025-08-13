@@ -92,7 +92,7 @@ const AuctionMgmtItem = ({ auction, onDelete }) => {
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-light text-gray-800 mb-2">Description</h3>
-                <p className="text-gray-600 font-thin">{auction.description || 'No description available'}</p>
+                <p className="text-gray-600 font-thin break-words">{auction.description || 'No description available'}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

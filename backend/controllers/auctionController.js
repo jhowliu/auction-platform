@@ -1,6 +1,5 @@
 const Auction = require('../models/Auction');
 
-
 const getAuctions = async (req, res) => {
   try {
     const { 
@@ -26,8 +25,8 @@ const getAuctions = async (req, res) => {
     const sortOptions = { [sortBy]: sortOrder };
 
     const auctions = await Auction.find(filter)
-      .populate('seller', 'username')
-      .populate('winner', 'username')
+      .populate('seller', 'name')
+      .populate('winner', 'name')
       .sort(sortOptions)
       .limit(limit * 1)
       .skip((page - 1) * limit);
@@ -56,8 +55,8 @@ const getAuctions = async (req, res) => {
 const getAuctionById = async (req, res) => {
   try {
     const auction = await Auction.findById(req.params.id)
-      .populate('seller', 'username email')
-      .populate('winner', 'username');
+      .populate('seller', 'name email')
+      .populate('winner', 'name');
 
     if (!auction) {
       return res.status(404).json({
