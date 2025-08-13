@@ -70,7 +70,7 @@ const placeBid = async (req, res) => {
       await session.commitTransaction();
 
       const populatedBid = await Bid.findById(newBid._id)
-        .populate('bidder', 'username')
+        .populate('bidder', 'name')
         .populate('auction', 'title');
 
       res.status(201).json({

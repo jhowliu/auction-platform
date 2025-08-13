@@ -19,7 +19,7 @@ const createAuction = async (req, res) => {
 
     const savedAuction = await newAuction.save();
     const populatedAuction = await Auction.findById(savedAuction._id)
-      .populate('seller', 'username email');
+      .populate('seller', 'name email');
     
     res.status(201).json({
       success: true,
@@ -38,7 +38,7 @@ const createAuction = async (req, res) => {
 // listing all aunction items that user created
 const getUserAuctions = async (req, res) => {
   try {
-    const auctions = await Auction.find({seller: req.user.id}).populate('seller', 'username')
+    const auctions = await Auction.find({seller: req.user.id}).populate('seller', 'name')
     res.json({
         success: true,
         data: auctions,
@@ -93,7 +93,7 @@ const updateAuction = async (req, res) => {
       req.params.id,
       updates,
       { new: true, runValidators: true }
-    ).populate('seller', 'username email');
+    ).populate('seller', 'name email');
 
     res.json({
       success: true,
