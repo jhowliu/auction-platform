@@ -2,45 +2,14 @@ const Auction = require('../models/Auction');
 
 const getAuctions = async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 10, 
-      category, 
-      status = 'active',
-      sortBy = 'endDate',
-      order = 'asc',
-      search
-    } = req.query;
-
-    const filter = { status };
-    if (category && category !== 'all') filter.category = category;
-    if (search) {
-      filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
-      ];
-    }
-
-    const sortOrder = order === 'desc' ? -1 : 1;
-    const sortOptions = { [sortBy]: sortOrder };
-
-    const auctions = await Auction.find(filter)
+    const auctions = await Auction.find({})
       .populate('seller', 'name')
       .populate('winner', 'name')
-      .sort(sortOptions)
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
-
-    const total = await Auction.countDocuments(filter);
+      .sort({ ['endDate']: -1 })
 
     res.json({
       success: true,
       data: auctions,
-      pagination: {
-        current: parseInt(page),
-        pages: Math.ceil(total / limit),
-        total
-      }
     });
   } catch (error) {
     res.status(500).json({

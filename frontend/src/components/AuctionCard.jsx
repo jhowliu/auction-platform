@@ -61,6 +61,16 @@ export default function AuctionCard({ auction, currentUser }) {
                 </div>
                 <p className="text-sm font-medium text-gray-900">${auction.currentPrice}</p>
                 <p className="text-sm font-medium text-red-600 mt-1">{timer}</p>
+                {auction.status === 'ended' && auction.winner && (
+                    <p className="text-sm font-medium text-green-600 mt-1">
+                        Winner: {auction.winner.name || 'Winner declared'}
+                    </p>
+                )}
+                {auction.status === 'ended' && !auction.winner && (
+                    <p className="text-sm font-medium text-gray-500 mt-1">
+                        No winner - No bids received
+                    </p>
+                )}
             </div>
         </div>
     )
