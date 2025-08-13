@@ -76,12 +76,16 @@ const updateAuction = async (req, res) => {
       });
     }
 
-    const allowedUpdates = ['title', 'description', 'images', 'endDate'];
+    const allowedUpdates = ['title', 'startingPrice', 'currentPrice', 'description', 'images', 'endDate'];
     const updates = {};
     
     allowedUpdates.forEach(field => {
       if (req.body[field] !== undefined) {
         updates[field] = req.body[field];
+        // make sure starting_price and current_price are the same before starting bid
+        if (field === 'startingPrice') {
+          updates['currentPrice'] = req.body[field]
+        }
       }
     });
 
