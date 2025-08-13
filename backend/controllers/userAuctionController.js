@@ -11,8 +11,8 @@ const createAuction = async (req, res) => {
       description,
       startingPrice,
       category,
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
+      startDate: new Date(startDate).toISOString(),
+      endDate: new Date(endDate).toISOString(),
       images: images || [],
       seller: req.user.id
     });

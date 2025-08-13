@@ -174,7 +174,7 @@ export default function AuctionDetail({ auction: propAuction }) {
                         </div>
 
                         {/* Description */}
-                        <div className="text-gray-600 leading-relaxed">
+                        <div className="text-gray-600 leading-relaxed break-words">
                             {auction.description}
                         </div>
 

@@ -99,7 +99,7 @@ const getBidsForAuction = async (req, res) => {
     const auctionId = req.params.id;
 
     const bids = await Bid.find({ auction: auctionId })
-      .populate('bidder', 'username')
+      .populate('bidder', 'name')
       .sort({ bidTime: -1 })
 
     const total = await Bid.countDocuments({ auction: auctionId });
