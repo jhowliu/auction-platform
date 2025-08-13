@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log("authcontext -> useEffect")
     const userData = localStorage.getItem('user');
     if (userData) {
       setUser(JSON.parse(userData));
