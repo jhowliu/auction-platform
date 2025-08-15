@@ -85,3 +85,9 @@ npm run dev
 ```bash
 npm start
 ```
+
+### User Credentials
+```
+email:test@gmail.com
+password:test
+```
